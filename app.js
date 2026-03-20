@@ -4,7 +4,8 @@
  */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+// signInWithPopup을 signInWithRedirect로 변경했습니다.
+import { getAuth, GoogleAuthProvider, signInWithRedirect, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const CONFIG = {
@@ -63,14 +64,11 @@ class ChoreApp {
         if (loginBtn) {
             loginBtn.onclick = async () => {
                 try {
-                    await signInWithPopup(this.auth, this.provider);
+                    // 팝업 통신 오류를 피하기 위해 화면 이동(리다이렉트) 방식으로 변경했습니다.
+                    await signInWithRedirect(this.auth, this.provider);
                 } catch (e) {
                     console.error("Login detail error:", e.code, e.message);
-                    if (e.code === 'auth/unauthorized-domain') {
-                        alert("현재 도메인이 Firebase 승인 목록에 없습니다. 콘솔에서 housechore.netlify.app을 추가하세요.");
-                    } else {
-                        alert(`로그인 오류: ${e.message}`);
-                    }
+                    alert(`로그인 준비 중 오류: ${e.message}`);
                 }
             };
         }
