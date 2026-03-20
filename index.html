@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>우리집 가사 요정 (Chore Tracker)</title>
+    
     <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Modern UI Fonts -->
+    
+    <!-- Fonts -->
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-[#f8fafc] text-[#1e293b] antialiased overflow-x-hidden">
@@ -18,38 +21,52 @@
     <div id="loadingOverlay" class="fixed inset-0 z-[100] bg-white flex items-center justify-center transition-opacity duration-500">
         <div class="flex flex-col items-center gap-4">
             <div class="w-12 h-12 border-4 border-orange-100 border-t-orange-500 rounded-full animate-spin"></div>
-            <p class="text-sm font-[800] text-slate-400 animate-pulse uppercase tracking-widest text-center">Magic is loading...</p>
+            <p class="text-sm font-black text-slate-400 animate-pulse uppercase tracking-widest text-center">Magic is loading...</p>
         </div>
     </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 glass-panel border border-slate-200 text-slate-800 px-6 py-4 rounded-2xl shadow-2xl font-bold text-sm z-[110] hidden opacity-0 transition-all duration-300 flex items-center gap-3 w-[92%] max-w-sm justify-center">
-        <span id="toastIcon" class="text-lg">✅</span> <span id="toastMsg">Saved successfully!</span>
+        <span id="toastIcon" class="text-lg">✅</span> <span id="toastMsg">성공적으로 저장되었습니다!</span>
     </div>
 
-    <!-- [View 1] LANDING PAGE (Before Login) -->
+    <!-- [VIEW 1] LANDING PAGE (로그인 전) -->
     <div id="landingPage" class="min-h-screen flex flex-col items-center justify-center p-6 bg-[#fffcf9] hidden">
         <div class="max-w-md w-full text-center space-y-8">
             <div class="text-7xl mb-4 transform hover:scale-110 transition-transform cursor-default">🧹</div>
             <div class="space-y-3">
-                <h1 class="text-4xl font-[900] tracking-tighter text-slate-900">우리집 <span class="text-orange-500">가사 요정</span></h1>
-                <p class="text-slate-500 font-medium leading-relaxed">복잡한 집안일, 이제 포인트로 즐겁게!<br>가족과 함께 기여도를 관리하세요.</p>
+                <h1 class="text-4xl font-[900] tracking-tighter text-slate-900">
+                    우리집 <span class="text-orange-500">가사 요정</span>
+                </h1>
+                <p class="text-slate-500 font-medium leading-relaxed">
+                    복잡한 집안일, 이제 포인트로 즐겁게!<br>
+                    가족과 함께 기여도를 실시간으로 확인하세요.
+                </p>
             </div>
+            
             <div class="pt-6">
                 <button id="googleLoginBtn" class="group w-full bg-white border border-slate-200 hover:border-orange-200 hover:bg-orange-50 text-slate-700 font-bold py-4 rounded-2xl transition-all shadow-sm flex items-center justify-center gap-3 active:scale-95">
-                    <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C43.396,35.509,46,30.316,46,24C46,22.659,45.862,21.35,43.611,20.083z"></path></svg>
-                    Google 계정으로 시작하기
+                    <svg class="w-5 h-5" viewBox="0 0 48 48">
+                        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
+                        <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
+                        <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C43.396,35.509,46,30.316,46,24C46,22.659,45.862,21.35,43.611,20.083z"></path>
+                    </svg>
+                    Google 계정으로 로그인
                 </button>
             </div>
             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Safe & Secured by HouseChod</p>
         </div>
     </div>
 
-    <!-- [View 2] DASHBOARD (After Login) -->
+    <!-- [VIEW 2] MAIN APP (로그인 후) -->
     <div id="mainApp" class="min-h-screen flex flex-col lg:flex-row hidden">
+        <!-- Sidebar -->
         <aside class="w-full lg:w-[380px] xl:w-[420px] bg-white lg:h-screen lg:sticky lg:top-0 lg:border-r border-slate-100 flex flex-col z-40 shadow-sm flex-shrink-0">
             <header class="px-6 py-5 lg:py-8 border-b border-slate-50 flex justify-between items-center bg-white/90 backdrop-blur-md sticky top-0 z-50">
-                <h1 class="text-2xl font-[900] text-slate-900 flex items-center gap-2 tracking-tighter"><span class="text-orange-500">🧹</span> 요정 보드</h1>
+                <h1 class="text-2xl font-[900] text-slate-900 flex items-center gap-2 tracking-tighter">
+                    <span class="text-orange-500">🧹</span> 요정 보드
+                </h1>
                 <div id="userProfile" class="flex items-center gap-3">
                     <div class="text-right hidden sm:block">
                         <p id="userNameDisplay" class="text-[11px] font-black text-slate-900 uppercase">User</p>
@@ -59,52 +76,113 @@
                 </div>
             </header>
 
+            <!-- Action Area -->
             <div class="p-6 overflow-y-auto flex-1 space-y-8 pb-20 lg:pb-8">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2"><span class="w-1.5 h-6 bg-orange-500 rounded-full"></span> 활동 기록</h2>
-                    <a href="admin.html" class="p-2 hover:bg-slate-50 rounded-xl transition-colors">⚙️</a>
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span class="w-1.5 h-6 bg-orange-500 rounded-full"></span>
+                        활동 기록하기
+                    </h2>
+                    <a href="admin.html" class="p-2 hover:bg-slate-50 rounded-xl transition-colors" title="시스템 설정">⚙️</a>
                 </div>
+                
                 <form id="choreForm" class="space-y-6">
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest text-[9px]">Date</label><input type="date" id="dateInput" required class="input-field font-num text-sm"></div>
-                        <div><label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest text-[9px]">Player</label><input type="text" id="nameInput" readonly class="input-field bg-slate-50 text-slate-400 cursor-not-allowed text-sm"></div>
-                    </div>
-                    <div><label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest text-[9px]">What did you do?</label><textarea id="detailInput" required rows="3" placeholder="예: 설거지 완료, 거실 청소" class="input-field resize-none leading-relaxed text-[15px]"></textarea></div>
-                    <div class="bg-orange-50/50 rounded-2xl p-5 border border-orange-100 space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-[9px] font-bold text-slate-400 mb-1.5 uppercase">Zone</label><input type="text" id="zoneInput" readonly class="w-full px-3 py-2 bg-white/80 border border-orange-100 rounded-xl text-xs font-bold text-slate-500" placeholder="-"></div>
-                            <div><label class="block text-[9px] font-bold text-slate-400 mb-1.5 uppercase">Points</label><input type="number" id="pointsInput" required class="w-full px-3 py-2 bg-white border-2 border-orange-200 rounded-xl text-sm font-[900] text-orange-600 font-num"></div>
+                        <div class="col-span-1">
+                            <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest">Date</label>
+                            <input type="date" id="dateInput" required class="input-field font-num text-sm">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest">Player</label>
+                            <input type="text" id="nameInput" readonly class="input-field bg-slate-50 text-slate-400 cursor-not-allowed text-sm">
                         </div>
                     </div>
-                    <button type="submit" id="submitBtn" class="w-full bg-slate-900 hover:bg-orange-600 active:scale-[0.98] text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-slate-200 uppercase tracking-widest text-xs">기록 등록하기</button>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest text-[9px]">Activity Details</label>
+                        <textarea id="detailInput" required rows="3" placeholder="예: 거실 청소기 돌림, 설거지 완료" class="input-field resize-none leading-relaxed text-[15px]"></textarea>
+                    </div>
+
+                    <!-- AI Analysis Preview -->
+                    <div class="bg-orange-50/50 rounded-2xl p-5 border border-orange-100 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-orange-400 uppercase tracking-widest">Analysis Result</span>
+                            <span class="flex h-1.5 w-1.5 rounded-full bg-orange-400 animate-pulse"></span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[9px] font-bold text-slate-400 mb-1.5 uppercase">Zone</label>
+                                <input type="text" id="zoneInput" readonly class="w-full px-3 py-2 bg-white/80 border border-orange-100 rounded-xl text-xs font-bold text-slate-500 focus:outline-none" placeholder="-">
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-bold text-slate-400 mb-1.5 uppercase">Points</label>
+                                <input type="number" id="pointsInput" required class="w-full px-3 py-2 bg-white border-2 border-orange-200 rounded-xl text-sm font-black text-orange-600 focus:outline-none font-num" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full bg-slate-900 hover:bg-orange-600 active:scale-[0.98] text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-slate-200 uppercase tracking-widest text-xs">등록하기</button>
                 </form>
             </div>
         </aside>
 
+        <!-- Right Content Area -->
         <main class="flex-1 min-w-0 bg-[#f8fafc] overflow-y-auto">
-            <div class="p-4 lg:p-10 space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-100 relative h-[380px] flex flex-col">
-                        <h3 class="text-xs font-[900] text-slate-400 uppercase tracking-widest mb-6">Contribution</h3>
-                        <div class="flex-1 relative flex justify-center items-center"><canvas id="shareChart"></canvas><div id="chartEmpty" class="absolute inset-0 flex items-center justify-center bg-white/90 hidden text-[10px] font-black text-slate-300 uppercase">No Activity</div></div>
+            <div class="p-4 lg:p-10 space-y-4 lg:space-y-10">
+                
+                <!-- Dashboard Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8">
+                    <div class="bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-100 relative h-[340px] lg:h-[380px] flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xs font-[900] text-slate-400 uppercase tracking-widest text-[10px]">Contribution Share</h3>
+                            <span class="text-[10px] font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-lg">누적 점유율</span>
+                        </div>
+                        <div class="flex-1 relative flex justify-center items-center">
+                            <canvas id="shareChart"></canvas>
+                            <div id="chartEmpty" class="absolute inset-0 flex items-center justify-center bg-white/90 backdrop-blur-sm z-10 hidden">
+                                <p class="text-xs font-bold text-slate-300 uppercase">No activity found</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-100 h-[380px] flex flex-col">
-                        <h3 class="text-xs font-[900] text-slate-400 uppercase tracking-widest mb-6 text-[10px]">7 Day Trend</h3>
-                        <div class="flex-1 relative"><canvas id="trendChart"></canvas></div>
+                    
+                    <div class="bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-100 h-[340px] lg:h-[380px] flex flex-col">
+                        <div class="flex justify-between items-center mb-6 text-[10px]">
+                            <h3 class="text-xs font-[900] text-slate-400 uppercase tracking-widest">Activity Trend</h3>
+                            <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">Last 7 Days</span>
+                        </div>
+                        <div class="flex-1 relative">
+                            <canvas id="trendChart"></canvas>
+                        </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden min-h-[500px]">
+
+                <!-- Log Table -->
+                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden flex flex-col min-h-[500px]">
                     <div class="px-8 py-7 border-b border-slate-50 flex justify-between items-center">
-                        <h3 class="text-xs font-black text-slate-900 uppercase tracking-widest">History</h3>
-                        <span id="totalLogsBadge" class="font-num text-[10px] font-bold bg-slate-900 text-white px-3 py-1.5 rounded-full uppercase tracking-tighter">0 logs</span>
+                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">History Logs</h3>
+                        <span id="totalLogsBadge" class="font-num text-[10px] font-bold bg-slate-900 text-white px-3 py-1.5 rounded-full uppercase tracking-tighter">0 Logs</span>
                     </div>
+                    
                     <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left"><thead class="bg-slate-50/50 text-slate-400 text-[10px] uppercase font-black tracking-widest border-b border-slate-50"><tr><th class="px-8 py-4">Date</th><th class="px-8 py-4">Fairy</th><th class="px-8 py-4">What</th><th class="px-8 py-4 text-right">Pts</th><th class="px-8 py-4 text-center"></th></tr></thead><tbody id="tableBody" class="divide-y divide-slate-50"></tbody></table>
+                        <table class="w-full text-sm text-left whitespace-nowrap">
+                            <thead class="bg-slate-50/50 text-slate-400 text-[10px] uppercase font-black tracking-widest border-b border-slate-50">
+                                <tr>
+                                    <th class="px-8 py-4">Date</th>
+                                    <th class="px-8 py-4">Fairy</th>
+                                    <th class="px-8 py-4">Activity</th>
+                                    <th class="px-8 py-4 text-right">Pts</th>
+                                    <th class="px-8 py-4 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody" class="divide-y divide-slate-50 font-medium text-slate-600"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </main>
     </div>
+
+    <!-- Firebase Logic -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
