@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>우리집 가사 요정 (Chore Tracker)</title>
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Fonts -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 lg:bg-[#fffcf9] min-h-screen m-0 p-0 overflow-x-hidden font-sans">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 glass-panel border border-slate-200 text-slate-800 px-6 py-4 rounded-2xl shadow-2xl font-bold text-sm z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center gap-3 w-[92%] max-w-sm justify-center">
+        <span id="toastIcon">✅</span> <span id="toastMsg">저장되었습니다!</span>
+    </div>
+
+    <div class="w-full min-h-screen flex flex-col lg:flex-row">
+        
+        <!-- Left Sidebar (Auth & Input) -->
+        <aside class="w-full lg:w-[400px] xl:w-[440px] bg-white lg:h-screen lg:sticky lg:top-0 lg:border-r border-slate-100 flex flex-col z-40 shadow-sm flex-shrink-0">
+            <header class="px-6 py-5 lg:py-8 border-b border-slate-50 sticky top-0 bg-white/90 backdrop-blur-md z-50 flex justify-between items-center">
+                <h1 class="text-2xl font-[900] text-slate-900 flex items-center gap-2 tracking-tighter">
+                    <span class="text-brand-500">🧹</span> 우리집 가사 요정
+                </h1>
+                <div id="userProfile" class="hidden flex items-center gap-2">
+                    <img id="userAvatar" src="" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm">
+                    <button id="logoutBtn" class="text-[10px] font-bold text-slate-400 hover:text-red-500 transition-colors uppercase tracking-widest">Logout</button>
+                </div>
+            </header>
+
+            <!-- Login Section -->
+            <section id="loginSection" class="p-8 flex-1 flex flex-col items-center justify-center text-center space-y-6">
+                <div class="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center text-4xl">✨</div>
+                <div>
+                    <h2 class="text-xl font-black text-slate-900 tracking-tight">요정 인증 필요</h2>
+                    <p class="text-sm text-slate-500 mt-2">집안일 포인트를 적립하려면<br>구글 계정으로 로그인해 주세요.</p>
+                </div>
+                <button id="googleLoginBtn" class="w-full bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold py-3.5 rounded-2xl transition-all shadow-sm flex items-center justify-center gap-3">
+                    <svg class="w-5 h-5" viewBox="0 0 48 48">
+                        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
+                        <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
+                        <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C43.396,35.509,46,30.316,46,24C46,22.659,45.862,21.35,43.611,20.083z"></path>
+                    </svg>
+                    Google 로그인
+                </button>
+            </section>
+
+            <!-- Action Form Section -->
+            <section id="mainFormSection" class="hidden p-6 overflow-y-auto flex-1 pb-12 lg:pb-8">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="w-8 h-1 bg-orange-500 rounded-full"></span>
+                    <h2 class="text-lg font-bold text-slate-800">활동 기록</h2>
+                </div>
+                <form id="choreForm" class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-widest">Date</label>
+                            <input type="date" id="dateInput" required class="input-field font-num">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-widest">Player</label>
+                            <input type="text" id="nameInput" readonly class="input-field bg-slate-50 text-slate-400 cursor-not-allowed">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-widest">Activities</label>
+                        <textarea id="detailInput" required rows="3" placeholder="어떤 일을 하셨나요?" class="input-field resize-none leading-relaxed"></textarea>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100 space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase">Zone</label><input type="text" id="zoneInput" readonly class="w-full px-3 py-2 bg-white/50 border border-slate-100 rounded-xl text-xs font-bold text-slate-500" placeholder="-"></div>
+                            <div><label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase">Type</label><input type="text" id="typeInput" readonly class="w-full px-3 py-2 bg-white/50 border border-slate-100 rounded-xl text-xs font-bold text-slate-500" placeholder="-"></div>
+                            <div><label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase">Level</label><input type="text" id="difficultyInput" readonly class="w-full px-3 py-2 bg-white/50 border border-slate-100 rounded-xl text-xs font-bold text-slate-500" placeholder="-"></div>
+                            <div><label class="block text-[10px] font-bold text-orange-600 mb-1.5 uppercase">Points</label><input type="number" id="pointsInput" required class="w-full px-3 py-2 bg-white border-2 border-orange-100 rounded-xl text-sm font-black text-orange-600 font-num"></div>
+                        </div>
+                    </div>
+                    <button type="submit" id="submitBtn" class="w-full bg-slate-900 hover:bg-orange-600 active:scale-[0.98] text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-slate-200">등록하기</button>
+                </form>
+            </section>
+        </aside>
+
+        <!-- Right Content Area -->
+        <main class="flex-1 min-w-0 bg-[#f8fafc]">
+            <div class="p-4 lg:p-10 space-y-4 lg:space-y-10">
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8">
+                    <div class="bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-100 relative h-72">
+                        <canvas id="shareChart"></canvas>
+                        <div id="chartEmpty" class="absolute inset-0 flex items-center justify-center bg-white/90 hidden text-xs font-bold text-slate-300 uppercase tracking-widest">No Data</div>
+                    </div>
+                    <div class="bg-white p-6 lg:p-8 rounded-[2rem] shadow-sm border border-slate-100 h-72">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- History Table Section -->
+                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden min-h-[500px]">
+                    <div class="px-8 py-7 border-b border-slate-50 flex justify-between items-center">
+                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">History</h3>
+                        <span id="totalLogsBadge" class="font-num text-[10px] font-bold bg-slate-900 text-white px-3 py-1.5 rounded-full uppercase tracking-tighter">0 logs</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black tracking-widest">
+                                <tr>
+                                    <th class="px-8 py-4">Date</th>
+                                    <th class="px-8 py-4">Player</th>
+                                    <th class="px-8 py-4">Category</th>
+                                    <th class="px-8 py-4">Activity</th>
+                                    <th class="px-8 py-4 text-right">Pts</th>
+                                    <th class="px-8 py-4"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody" class="divide-y divide-slate-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase SDK & Application Script -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
