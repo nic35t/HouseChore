@@ -1,10 +1,9 @@
-/* UI Foundation & Typography
-   Standard Modern UI Letter-spacing: -0.02em for Korean, -0.04em for titles 
+/* HouseChore Modern UI Framework 
+   Design Tokens & Interaction Definitions 
 */
+
 body { 
-    background-color: #f8fafc; 
-    color: #1e293b; 
-    -webkit-font-smoothing: antialiased; 
+    font-family: 'Inter', 'Pretendard Variable', -apple-system, sans-serif;
     letter-spacing: -0.02em; 
 }
 
@@ -16,44 +15,42 @@ h1, h2, h3 {
     font-feature-settings: "tnum" on, "lnum" on; 
 }
 
-/* Glass Panel Effect for Modals/Toasts */
+/* Glassmorphism Effect */
 .glass-panel { 
     background: rgba(255, 255, 255, 0.85); 
-    backdrop-filter: blur(12px); 
-    -webkit-backdrop-filter: blur(12px); 
+    backdrop-filter: blur(16px); 
+    -webkit-backdrop-filter: blur(16px); 
 }
 
-/* Reusable Input Styling */
+/* Form Interaction */
 .input-field {
     width: 100%; 
-    padding: 0.75rem 1rem; 
-    border-radius: 0.875rem; 
-    border: 1.5px solid #e2e8f0;
+    padding: 0.875rem 1.125rem; 
+    border-radius: 1rem; 
+    border: 2px solid #f1f5f9;
     background-color: #fcfcfc; 
     font-weight: 500; 
     color: #334155; 
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    font-size: 16px;
+    transition: all 0.2s ease;
 }
 
 .input-field:focus { 
     outline: none; 
     border-color: #f97316; 
-    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1); 
-    background-color: #fff; 
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.08); 
 }
-
-.input-field::placeholder {
-    color: #94a3b8;
-}
-
-/* Scrollbar Customization */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
 
 /* Animations */
+#landingPage, #mainApp {
+    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes slideUp { 
     from { transform: translate(-50%, 20px); opacity: 0; } 
     to { transform: translate(-50%, 0); opacity: 1; } 
@@ -61,4 +58,14 @@ h1, h2, h3 {
 
 .toast-animate { 
     animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+    .input-field { font-size: 16px; }
 }
