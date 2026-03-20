@@ -1,8 +1,12 @@
+/**
+ * Chore Tracker Application - HouseChod Ver.
+ * Refactored for Stability & Detailed Error Logging
+ */
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// --- Configuration ---
 const CONFIG = {
     firebaseConfig: {
         apiKey: "REMOVED_FIREBASE_WEB_API_KEY",
@@ -15,9 +19,9 @@ const CONFIG = {
     appId: 'housechod-v1',
     defaultRules: [
         { match: "설거지|식세기", zone: '주방', pts: 10 },
-        { match: "쓰레기|분리수거", zone: '외부', pts: 15 },
-        { match: "청소기|걸레", zone: '거실', pts: 10 },
-        { match: "빨래|세탁", zone: '다용도실', pts: 5 }
+        { match: "분리수거|음식물|쓰레기", zone: '외부', pts: 15 },
+        { match: "청소기|바닥|걸레", zone: '거실', pts: 10 },
+        { match: "빨래|건조기", zone: '다용도실', pts: 5 }
     ]
 };
 
@@ -28,6 +32,9 @@ class ChoreApp {
         this.db = getFirestore(this.app);
         this.provider = new GoogleAuthProvider();
         
+        // 팝업 시 계정 선택 강제 (세션 꼬임 방지)
+        this.provider.setCustomParameters({ prompt: 'select_account' });
+        
         this.user = null;
         this.rules = [];
         this.charts = { share: null, trend: null };
@@ -37,7 +44,6 @@ class ChoreApp {
     }
 
     init() {
-        // 인증 상태 실시간 모니터링
         onAuthStateChanged(this.auth, (user) => {
             this.user = user;
             this.toggleUI();
@@ -45,7 +51,6 @@ class ChoreApp {
                 this.loadRules();
                 this.loadData();
             }
-            // 글로벌 로더 제거
             const loader = document.getElementById('loadingOverlay');
             if (loader) loader.classList.add('opacity-0', 'pointer-events-none');
         });
@@ -60,8 +65,12 @@ class ChoreApp {
                 try {
                     await signInWithPopup(this.auth, this.provider);
                 } catch (e) {
-                    console.error("Login Error:", e);
-                    alert("로그인에 실패했습니다. Firebase 콘솔에서 도메인이 승인되었는지 확인하세요.");
+                    console.error("Login detail error:", e.code, e.message);
+                    if (e.code === 'auth/unauthorized-domain') {
+                        alert("현재 도메인이 Firebase 승인 목록에 없습니다. 콘솔에서 housechore.netlify.app을 추가하세요.");
+                    } else {
+                        alert(`로그인 오류: ${e.message}`);
+                    }
                 }
             };
         }
@@ -91,12 +100,12 @@ class ChoreApp {
         const ref = doc(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'settings');
         onSnapshot(ref, s => {
             this.rules = s.exists() ? s.data().rules : CONFIG.defaultRules;
-        });
+        }, err => console.error("Rules sync failed:", err));
     }
 
-    handleAutoFill(text) {
-        if(!text.trim()) return;
-        const rule = this.rules.find(r => new RegExp(r.match, 'i').test(text));
+    handleAutoFill(t) {
+        if(!t.trim()) return;
+        const rule = this.rules.find(r => new RegExp(r.match, 'i').test(t));
         if(rule) {
             document.getElementById('zoneInput').value = rule.zone;
             document.getElementById('pointsInput').value = rule.pts;
@@ -117,15 +126,19 @@ class ChoreApp {
         try {
             await addDoc(collection(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'chores'), payload);
             document.getElementById('detailInput').value = '';
-            this.toast("기록 완료! ✨");
-        } catch(e) { this.toast("저장 실패", "err"); }
+            ['zoneInput', 'pointsInput'].forEach(id => document.getElementById(id).value = '');
+            this.toast("포인트 적립 완료! ✨");
+        } catch(e) { 
+            console.error("Save error:", e);
+            this.toast("저장 중 오류 발생", "err"); 
+        }
     }
 
     async delete(id) {
         try {
             await deleteDoc(doc(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'chores', id));
             this.toast("삭제되었습니다.");
-        } catch(e) { this.toast("권한 없음", "err"); }
+        } catch(e) { this.toast("삭제 권한 없음", "err"); }
     }
 
     loadData() {
@@ -134,7 +147,7 @@ class ChoreApp {
             const data = s.docs.map(v => ({id: v.id, ...v.data()})).sort((a,b) => b.createdAt - a.createdAt);
             this.renderTable(data);
             this.renderCharts(data);
-        });
+        }, err => console.error("Data sync failed:", err));
     }
 
     renderTable(data) {
@@ -143,12 +156,12 @@ class ChoreApp {
         document.getElementById('totalLogsBadge').innerText = `${data.length} Logs`;
         data.forEach(item => {
             const tr = document.createElement('tr');
-            tr.className = "group hover:bg-slate-50 transition-all border-b border-slate-50 last:border-0";
+            tr.className = "group hover:bg-slate-50/50 transition-all border-b border-slate-50 last:border-0";
             tr.innerHTML = `
                 <td class="px-8 py-5 font-num text-slate-400 font-bold text-xs">${item.date.split('-').slice(1).join('.')}</td>
                 <td class="px-8 py-5"><span class="bg-slate-900 text-white px-2.5 py-1 rounded-lg text-[10px] font-black uppercase">${item.name}</span></td>
                 <td class="px-8 py-5 whitespace-normal font-semibold text-slate-600 text-sm">
-                    <span class="block text-[10px] text-slate-400 uppercase mb-0.5">${item.zone}</span>
+                    <span class="block text-[10px] text-slate-400 uppercase mb-0.5 tracking-tighter">${item.zone}</span>
                     ${item.detail}
                 </td>
                 <td class="px-8 py-5 text-right font-black text-orange-600 font-num text-base">+${item.points}</td>
@@ -161,8 +174,10 @@ class ChoreApp {
     }
 
     renderCharts(data) {
-        document.getElementById('chartEmpty').classList.toggle('hidden', data.length > 0);
+        const empty = document.getElementById('chartEmpty');
+        if (empty) empty.classList.toggle('hidden', data.length > 0);
         if(data.length === 0) return;
+
         const pts = {}, daily = {};
         data.forEach(c => {
             pts[c.name] = (pts[c.name]||0)+c.points;
@@ -173,21 +188,24 @@ class ChoreApp {
         if(this.charts.share) this.charts.share.destroy();
         this.charts.share = new Chart(document.getElementById('shareChart'), {
             type: 'doughnut', data: { labels: names, datasets: [{ data: Object.values(pts), backgroundColor: this.colors, borderWidth: 0 }] },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'right', labels: { boxWidth: 6, font: { weight: 'bold', size: 10 } } } } }
+            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'right' } } }
         });
         const sortedDates = Object.keys(daily).sort().slice(-7);
         if(this.charts.trend) this.charts.trend.destroy();
         this.charts.trend = new Chart(document.getElementById('trendChart'), {
             type: 'bar', data: { labels: sortedDates.map(d => d.substring(5)), datasets: names.map((n, i) => ({ label: n, data: sortedDates.map(d => daily[d][n]||0), backgroundColor: this.colors[i % this.colors.length], borderRadius: 6 })) },
-            options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } }, plugins: { legend: { display: false } } }
+            options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
         });
     }
 
     toast(msg, type="success") {
         const t = document.getElementById('toast');
-        document.getElementById('toastMsg').innerText = msg;
-        t.classList.remove('hidden', 'opacity-0'); t.classList.add('toast-animate');
-        setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => t.classList.add('hidden'), 300); }, 3000);
+        const m = document.getElementById('toastMsg');
+        if (t && m) {
+            m.innerText = msg;
+            t.classList.remove('hidden', 'opacity-0'); t.classList.add('toast-animate');
+            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => t.classList.add('hidden'), 300); }, 3000);
+        }
     }
 }
 window.app = new ChoreApp();
