@@ -1,4 +1,6 @@
-/* UI Foundation */
+/* UI Foundation & Typography
+   Standard Modern UI Letter-spacing: -0.02em for Korean, -0.04em for titles 
+*/
 body { 
     background-color: #f8fafc; 
     color: #1e293b; 
@@ -6,12 +8,22 @@ body {
     letter-spacing: -0.02em; 
 }
 
-/* Custom Typography */
+h1, h2, h3 { 
+    letter-spacing: -0.04em; 
+}
+
 .font-num { 
     font-feature-settings: "tnum" on, "lnum" on; 
 }
 
-/* Input Styles */
+/* Glass Panel Effect for Modals/Toasts */
+.glass-panel { 
+    background: rgba(255, 255, 255, 0.85); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+}
+
+/* Reusable Input Styling */
 .input-field {
     width: 100%; 
     padding: 0.75rem 1rem; 
@@ -31,12 +43,15 @@ body {
     background-color: #fff; 
 }
 
-/* Modern Effects */
-.glass-panel { 
-    background: rgba(255, 255, 255, 0.85); 
-    backdrop-filter: blur(12px); 
-    -webkit-backdrop-filter: blur(12px); 
+.input-field::placeholder {
+    color: #94a3b8;
 }
+
+/* Scrollbar Customization */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
 
 /* Animations */
 @keyframes slideUp { 
@@ -47,9 +62,3 @@ body {
 .toast-animate { 
     animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
 }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
