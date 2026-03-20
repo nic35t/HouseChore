@@ -1,71 +1,12 @@
-/* HouseChore Modern UI Framework 
-   Design Tokens & Interaction Definitions 
-*/
-
-body { 
-    font-family: 'Inter', 'Pretendard Variable', -apple-system, sans-serif;
-    letter-spacing: -0.02em; 
-}
-
-h1, h2, h3 { 
-    letter-spacing: -0.04em; 
-}
-
-.font-num { 
-    font-feature-settings: "tnum" on, "lnum" on; 
-}
-
-/* Glassmorphism Effect */
-.glass-panel { 
-    background: rgba(255, 255, 255, 0.85); 
-    backdrop-filter: blur(16px); 
-    -webkit-backdrop-filter: blur(16px); 
-}
-
-/* Form Interaction */
-.input-field {
-    width: 100%; 
-    padding: 0.875rem 1.125rem; 
-    border-radius: 1rem; 
-    border: 2px solid #f1f5f9;
-    background-color: #fcfcfc; 
-    font-weight: 500; 
-    color: #334155; 
-    transition: all 0.2s ease;
-}
-
-.input-field:focus { 
-    outline: none; 
-    border-color: #f97316; 
-    background-color: #fff;
-    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.08); 
-}
-
-/* Animations */
-#landingPage, #mainApp {
-    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideUp { 
-    from { transform: translate(-50%, 20px); opacity: 0; } 
-    to { transform: translate(-50%, 0); opacity: 1; } 
-}
-
-.toast-animate { 
-    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
-}
-
-/* Custom Scrollbar */
+body { font-family: 'Inter', 'Pretendard Variable', sans-serif; letter-spacing: -0.02em; }
+h1, h2, h3 { letter-spacing: -0.04em; }
+.font-num { font-feature-settings: "tnum" on, "lnum" on; }
+.glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.input-field { width: 100%; padding: 0.875rem 1.125rem; border-radius: 1rem; border: 2px solid #f1f5f9; background-color: #fcfcfc; font-weight: 500; color: #334155; transition: all 0.2s ease; font-size: 16px; }
+.input-field:focus { outline: none; border-color: #f97316; background-color: #fff; box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.08); }
+#landingPage, #mainApp { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+.toast-animate { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 ::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-
-/* Responsive Adjustments */
-@media (max-width: 1024px) {
-    .input-field { font-size: 16px; }
-}
