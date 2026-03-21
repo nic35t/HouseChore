@@ -31,20 +31,24 @@ class ChoreApp {
         this.auth = getAuth(this.app);
         this.db = getFirestore(this.app);
         this.provider = new GoogleAuthProvider();
-        
-        // 팝업 시 계정 선택 강제 (세션 꼬임 방지)
+
         this.provider.setCustomParameters({ prompt: 'select_account' });
-        
+
         this.user = null;
-        this.rules = CONFIG.defaultRules; // 기본값으로 즉시 초기화
+        this.rules = CONFIG.defaultRules;
         this.charts = { share: null, trend: null };
         this.colors = ['#f97316', '#0f172a', '#3b82f6', '#10b981', '#a855f7', '#ec4899'];
-        
+        this.unsubscribers = []; // ✅ 리스너 정리용
+
         this.init();
     }
 
     init() {
         onAuthStateChanged(this.auth, (user) => {
+            // ✅ 로그아웃 시 기존 리스너 전부 정리
+            this.unsubscribers.forEach(unsub => unsub());
+            this.unsubscribers = [];
+
             this.user = user;
             this.toggleUI();
             if (user) {
@@ -80,7 +84,7 @@ class ChoreApp {
     toggleUI() {
         const landing = document.getElementById('landingPage');
         const main = document.getElementById('mainApp');
-        if(this.user) {
+        if (this.user) {
             landing?.classList.add('hidden');
             main?.classList.remove('hidden');
             document.getElementById('userAvatar').src = this.user.photoURL;
@@ -89,20 +93,24 @@ class ChoreApp {
         } else {
             landing?.classList.remove('hidden');
             main?.classList.add('hidden');
+            // ✅ 로그아웃 시 차트 숨김
+            const chartsSection = document.getElementById('chartsSection');
+            if (chartsSection) chartsSection.classList.add('hidden');
         }
     }
 
     loadRules() {
         const ref = doc(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'settings');
-        onSnapshot(ref, s => {
+        const unsub = onSnapshot(ref, s => {
             this.rules = s.exists() ? s.data().rules : CONFIG.defaultRules;
         }, err => console.error("Rules sync failed:", err));
+        this.unsubscribers.push(unsub); // ✅ 등록
     }
 
     handleAutoFill(t) {
-        if(!t.trim()) return;
+        if (!t.trim()) return;
         const rule = this.rules.find(r => new RegExp(r.match, 'i').test(t));
-        if(rule) {
+        if (rule) {
             document.getElementById('zoneInput').value = rule.zone;
             document.getElementById('pointsInput').value = rule.pts;
         }
@@ -110,6 +118,7 @@ class ChoreApp {
 
     async handleSave(e) {
         e.preventDefault();
+        if (!this.user) return;
         const payload = {
             date: document.getElementById('dateInput').value,
             name: this.user.displayName,
@@ -124,9 +133,9 @@ class ChoreApp {
             document.getElementById('detailInput').value = '';
             ['zoneInput', 'pointsInput'].forEach(id => document.getElementById(id).value = '');
             this.toast("포인트 적립 완료! ✨");
-        } catch(e) { 
+        } catch(e) {
             console.error("Save error:", e);
-            this.toast("저장 중 오류 발생", "err"); 
+            this.toast("저장 중 오류 발생", "err");
         }
     }
 
@@ -139,11 +148,13 @@ class ChoreApp {
 
     loadData() {
         const ref = collection(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'chores');
-        onSnapshot(ref, s => {
+        const unsub = onSnapshot(ref, s => {
+            if (!this.user) return; // ✅ 안전 가드
             const data = s.docs.map(v => ({id: v.id, ...v.data()})).sort((a,b) => b.createdAt - a.createdAt);
             this.renderTable(data);
             this.renderCharts(data);
         }, err => console.error("Data sync failed:", err));
+        this.unsubscribers.push(unsub); // ✅ 등록
     }
 
     renderTable(data) {
@@ -162,7 +173,7 @@ class ChoreApp {
                 </td>
                 <td class="px-8 py-5 text-right font-black text-orange-600 font-num text-base">+${item.points}</td>
                 <td class="px-8 py-5 text-center">
-                    ${item.uid === this.user.uid ? `<button onclick="window.app.delete('${item.id}')" class="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-50 hover:text-red-500 rounded-xl transition-all">🗑️</button>` : ''}
+                    ${item.uid === this.user?.uid ? `<button onclick="window.app.delete('${item.id}')" class="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-50 hover:text-red-500 rounded-xl transition-all">🗑️</button>` : ''}
                 </td>
             `;
             body.appendChild(tr);
@@ -172,22 +183,22 @@ class ChoreApp {
     renderCharts(data) {
         const chartsSection = document.getElementById('chartsSection');
         if (chartsSection) chartsSection.classList.toggle('hidden', data.length === 0);
-        if(data.length === 0) return;
+        if (data.length === 0) return;
 
         const pts = {}, daily = {};
         data.forEach(c => {
             pts[c.name] = (pts[c.name]||0)+c.points;
-            if(!daily[c.date]) daily[c.date] = {};
+            if (!daily[c.date]) daily[c.date] = {};
             daily[c.date][c.name] = (daily[c.date][c.name]||0)+c.points;
         });
         const names = Object.keys(pts);
-        if(this.charts.share) this.charts.share.destroy();
+        if (this.charts.share) this.charts.share.destroy();
         this.charts.share = new Chart(document.getElementById('shareChart'), {
             type: 'doughnut', data: { labels: names, datasets: [{ data: Object.values(pts), backgroundColor: this.colors, borderWidth: 0 }] },
             options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'right' } } }
         });
         const sortedDates = Object.keys(daily).sort().slice(-7);
-        if(this.charts.trend) this.charts.trend.destroy();
+        if (this.charts.trend) this.charts.trend.destroy();
         this.charts.trend = new Chart(document.getElementById('trendChart'), {
             type: 'bar', data: { labels: sortedDates.map(d => d.substring(5)), datasets: names.map((n, i) => ({ label: n, data: sortedDates.map(d => daily[d][n]||0), backgroundColor: this.colors[i % this.colors.length], borderRadius: 6 })) },
             options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
