@@ -1,40 +1,46 @@
-/* UI Foundation */
-body { 
-    font-family: 'Inter', 'Pretendard Variable', sans-serif;
-    letter-spacing: -0.02em; 
-}
+/* style.css - HouseChod supplemental styles */
 
-h1, h2, h3 { letter-spacing: -0.04em; }
-.font-num { font-feature-settings: "tnum" on, "lnum" on; }
-
-/* Glass Panel Effect */
-.glass-panel { 
-    background: rgba(255, 255, 255, 0.85); 
-    backdrop-filter: blur(12px); 
-    -webkit-backdrop-filter: blur(12px); 
-}
-
-/* Form Styles */
+/* ── Input field base (desktop form) ── */
 .input-field {
-    width: 100%; padding: 0.875rem 1.125rem; border-radius: 1rem; border: 2px solid #f1f5f9;
-    background-color: #fcfcfc; font-weight: 500; color: #334155; transition: all 0.2s ease;
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #0f172a;
+    background: white;
+    outline: none;
+    transition: border-color .2s;
+    -webkit-appearance: none;
+    appearance: none;
 }
-.input-field:focus { 
-    outline: none; border-color: #f97316; background-color: #fff;
-    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.08); 
+.input-field:focus {
+    border-color: #f97316;
 }
 
-/* Animations */
-#landingPage, #mainApp { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-.toast-animate { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
-/* Custom Scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-
-/* Mobile Optimization */
-@media (max-width: 1024px) {
-    .input-field { font-size: 16px; }
+/* ── Glass panel (legacy toast support) ── */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
 }
+
+/* ── Toast animate (legacy) ── */
+.toast-animate {
+    animation: toastIn .3s ease;
+}
+@keyframes toastIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ── Numeric font helper ── */
+.font-num {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Scrollbar hide utility ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
