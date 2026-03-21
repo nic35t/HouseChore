@@ -36,7 +36,7 @@ class ChoreApp {
         this.provider.setCustomParameters({ prompt: 'select_account' });
         
         this.user = null;
-        this.rules = [];
+        this.rules = CONFIG.defaultRules; // 기본값으로 즉시 초기화
         this.charts = { share: null, trend: null };
         this.colors = ['#f97316', '#0f172a', '#3b82f6', '#10b981', '#a855f7', '#ec4899'];
         
@@ -170,8 +170,8 @@ class ChoreApp {
     }
 
     renderCharts(data) {
-        const empty = document.getElementById('chartEmpty');
-        if (empty) empty.classList.toggle('hidden', data.length > 0);
+        const chartsSection = document.getElementById('chartsSection');
+        if (chartsSection) chartsSection.classList.toggle('hidden', data.length === 0);
         if(data.length === 0) return;
 
         const pts = {}, daily = {};
