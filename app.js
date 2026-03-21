@@ -35,17 +35,30 @@ class ChoreApp {
         this.provider.setCustomParameters({ prompt: 'select_account' });
 
         this.user = null;
-        this.rules = CONFIG.defaultRules;
+        this.rules = CONFIG.defaultRules; // 기본값으로 즉시 초기화 (자동완성 타이밍 버그 수정)
         this.charts = { share: null, trend: null };
         this.colors = ['#f97316', '#0f172a', '#3b82f6', '#10b981', '#a855f7', '#ec4899'];
-        this.unsubscribers = []; // ✅ 리스너 정리용
+        this.unsubscribers = []; // 리스너 정리용
 
         this.init();
     }
 
     init() {
+        // 안전장치: 최대 5초 후 강제로 오버레이 제거
+        setTimeout(() => {
+            const loader = document.getElementById('loadingOverlay');
+            if (loader) loader.classList.add('hidden');
+        }, 5000);
+
         onAuthStateChanged(this.auth, (user) => {
-            // ✅ 로그아웃 시 기존 리스너 전부 정리
+            // 콜백 시작하자마자 오버레이 제거 (에러 나도 안전)
+            const loader = document.getElementById('loadingOverlay');
+            if (loader) {
+                loader.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => loader.classList.add('hidden'), 500);
+            }
+
+            // 로그아웃 시 기존 리스너 전부 정리 (중복 리스너 방지)
             this.unsubscribers.forEach(unsub => unsub());
             this.unsubscribers = [];
 
@@ -55,8 +68,6 @@ class ChoreApp {
                 this.loadRules();
                 this.loadData();
             }
-            const loader = document.getElementById('loadingOverlay');
-            if (loader) loader.classList.add('opacity-0', 'pointer-events-none');
         });
 
         this.bindEvents();
@@ -93,7 +104,7 @@ class ChoreApp {
         } else {
             landing?.classList.remove('hidden');
             main?.classList.add('hidden');
-            // ✅ 로그아웃 시 차트 숨김
+            // 로그아웃 시 차트 숨김
             const chartsSection = document.getElementById('chartsSection');
             if (chartsSection) chartsSection.classList.add('hidden');
         }
@@ -104,7 +115,7 @@ class ChoreApp {
         const unsub = onSnapshot(ref, s => {
             this.rules = s.exists() ? s.data().rules : CONFIG.defaultRules;
         }, err => console.error("Rules sync failed:", err));
-        this.unsubscribers.push(unsub); // ✅ 등록
+        this.unsubscribers.push(unsub);
     }
 
     handleAutoFill(t) {
@@ -149,12 +160,12 @@ class ChoreApp {
     loadData() {
         const ref = collection(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'chores');
         const unsub = onSnapshot(ref, s => {
-            if (!this.user) return; // ✅ 안전 가드
+            if (!this.user) return; // 로그아웃 후 null 참조 방지
             const data = s.docs.map(v => ({id: v.id, ...v.data()})).sort((a,b) => b.createdAt - a.createdAt);
             this.renderTable(data);
             this.renderCharts(data);
         }, err => console.error("Data sync failed:", err));
-        this.unsubscribers.push(unsub); // ✅ 등록
+        this.unsubscribers.push(unsub);
     }
 
     renderTable(data) {
