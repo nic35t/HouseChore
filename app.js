@@ -1,6 +1,6 @@
 /**
- * Chore Tracker - HouseChod
- * Mobile-optimized version
+ * Chore Tracker - HouseChod (Ver 2)
+ * Mobile-optimized version with unit changed to minutes (분)
  */
 
 import { initializeApp }        from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -201,7 +201,8 @@ class ChoreApp {
                 document.getElementById('zoneInput').value   = '';
                 document.getElementById('pointsInput').value = '';
             }
-            this._toast('포인트 적립 완료! ✨');
+            // 단위 변경 반영
+            this._toast('시간 기록 완료! ✨');
 
             // [추가됨] 모바일 브릿지 트리거 (mobile-bridge.js 연동)
             if (window.onChoreAdded) window.onChoreAdded();
@@ -261,7 +262,7 @@ class ChoreApp {
                   <span style="display:block;font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;margin-bottom:2px">${item.zone}</span>
                   ${item.detail}
                 </td>
-                <td class="r"><span class="pts-bdg">+${item.points}</span></td>
+                <td class="r"><span class="pts-bdg">${item.points}분</span></td>
                 <td class="c">${item.uid === this.user?.uid
                     ? `<button class="del-btn" onclick="window.app.delete('${item.id}')">🗑️</button>`
                     : ''}</td>`;
@@ -354,11 +355,12 @@ class ChoreApp {
             return;
         }
         const medals = ['🥇','🥈','🥉'];
+        // 단위 변경 반영 (pt -> 분)
         row.innerHTML = sorted.map(([name, pts], i) =>
             `<div class="rank-pill ${name === me ? 'me' : ''}">
               <span>${medals[i] || `#${i+1}`}</span>
               <span>${name}</span>
-              <span style="color:var(--or);font-weight:900">${pts}pt</span>
+              <span style="color:var(--or);font-weight:900">${pts}분</span>
             </div>`
         ).join('');
     }
@@ -380,6 +382,7 @@ class ChoreApp {
         items.forEach(item => {
             const card = document.createElement('div');
             card.className = 'a-card';
+            // 단위 변경 반영 (pts -> 분)
             card.innerHTML = `
                 <div class="a-icon">${this._zoneEmoji(item.zone)}</div>
                 <div class="a-info">
@@ -387,8 +390,8 @@ class ChoreApp {
                   <div class="a-meta">${item.name} · ${item.date?.slice(5).replace('-','/')} · ${item.zone||'기타'}</div>
                 </div>
                 <div class="a-pts">
-                  <span class="a-pts-v">+${item.points}</span>
-                  <span class="a-pts-l">pts</span>
+                  <span class="a-pts-v">${item.points}</span>
+                  <span class="a-pts-l">분</span>
                 </div>`;
             el.appendChild(card);
         });

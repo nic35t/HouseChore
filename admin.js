@@ -32,7 +32,8 @@ class AdminApp {
         const cont = document.getElementById('rulesList'); cont.innerHTML = '';
         this.localRules.forEach((r, i) => {
             const div = document.createElement('div'); div.className = "bg-white p-6 rounded-2xl border border-slate-100 relative group shadow-sm";
-            div.innerHTML = `<button onclick="window.admin.delRule(${i})" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 font-bold text-[10px] uppercase">Remove</button><div class="grid grid-cols-2 gap-4 mb-4"><input type="text" placeholder="키워드" value="${r.match}" onchange="window.admin.updRule(${i},'match',this.value)" class="p-3 bg-slate-50 rounded-xl text-sm font-bold"><input type="number" placeholder="포인트" value="${r.pts}" onchange="window.admin.updRule(${i},'pts',this.value)" class="p-3 bg-slate-50 rounded-xl text-sm font-black text-orange-600"></div><input type="text" placeholder="구역" value="${r.zone}" onchange="window.admin.updRule(${i},'zone',this.value)" class="w-full p-2.5 text-xs bg-slate-50/50 rounded-lg">`;
+            // 단위 변경 반영 (포인트 -> 시간(분))
+            div.innerHTML = `<button onclick="window.admin.delRule(${i})" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 font-bold text-[10px] uppercase">Remove</button><div class="grid grid-cols-2 gap-4 mb-4"><input type="text" placeholder="키워드" value="${r.match}" onchange="window.admin.updRule(${i},'match',this.value)" class="p-3 bg-slate-50 rounded-xl text-sm font-bold"><input type="number" placeholder="시간(분)" value="${r.pts}" onchange="window.admin.updRule(${i},'pts',this.value)" class="p-3 bg-slate-50 rounded-xl text-sm font-black text-orange-600"></div><input type="text" placeholder="구역" value="${r.zone}" onchange="window.admin.updRule(${i},'zone',this.value)" class="w-full p-2.5 text-xs bg-slate-50/50 rounded-lg">`;
             cont.appendChild(div);
         });
     }
@@ -47,7 +48,8 @@ class AdminApp {
     async export() {
         const snap = await getDocs(collection(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'chores'));
         const logs = snap.docs.map(d => d.data());
-        let csv = "\uFEFF날짜,요정,활동,포인트,구역\n";
+        // 단위 변경 반영 (포인트 -> 시간(분))
+        let csv = "\uFEFF날짜,요정,활동,시간(분),구역\n";
         logs.forEach(l => csv += `${l.date},${l.name},"${String(l.detail).replace(/"/g,'""')}",${l.points},${l.zone}\n`);
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
         a.download = `housechore_${new Date().toISOString().slice(0,10)}.csv`; a.click();

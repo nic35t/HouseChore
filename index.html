@@ -220,10 +220,12 @@ html,body{height:100%;font-family:'Pretendard Variable','Pretendard',-apple-syst
   /* Charts */
   .d-charts{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
   .d-cc{background:#fff;border-radius:24px;border:1px solid var(--bd);padding:24px;height:340px;display:flex;flex-direction:column}
+  
+  /* 오버플로우 수정을 반영한 d-cc-wrap 부분 */
   .d-cc-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
   .d-cc-ttl{font-size:11px;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em}
   .d-cc-bdg{font-size:10px;font-weight:700;color:var(--or);background:var(--or-lt);padding:4px 10px;border-radius:8px}
-  .d-cc-wrap{flex:1;position:relative}
+  .d-cc-wrap{flex:1;position:relative;min-height:0;min-width:0;padding-bottom:10px}
 
   /* Table */
   .d-tw{background:#fff;border-radius:24px;border:1px solid var(--bd);overflow:hidden}
@@ -265,7 +267,7 @@ html,body{height:100%;font-family:'Pretendard Variable','Pretendard',-apple-syst
   <div class="l-inner">
     <span class="l-emoji">🧹</span>
     <h1 class="l-title">우리집<br><span>가사 요정</span></h1>
-    <p class="l-desc">복잡한 집안일, 이제 포인트로 즐겁게!<br>가족과 함께 기여도를 실시간으로 확인해요.</p>
+    <p class="l-desc">복잡한 집안일, 이제 시간 기록으로 확실하게!<br>가족과 함께 기여도를 실시간으로 확인해요.</p>
     <button id="googleLoginBtn" class="google-btn">
       <svg width="20" height="20" viewBox="0 0 48 48">
         <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
@@ -296,7 +298,7 @@ html,body{height:100%;font-family:'Pretendard Variable','Pretendard',-apple-syst
       <!-- HOME -->
       <div class="view active" id="viewHome">
         <div class="score-card" style="margin-top:16px">
-          <div class="sc-lbl">내 이번 달 포인트</div>
+          <div class="sc-lbl">내 이번 달 소요 시간(분)</div>
           <div class="sc-val" id="myScoreM">0</div>
           <div class="sc-sub" id="myRankM">이번 달 활동을 기록해보세요!</div>
         </div>
@@ -391,7 +393,7 @@ html,body{height:100%;font-family:'Pretendard Variable','Pretendard',-apple-syst
           <div class="ai-hdr"><span class="ai-dot"></span>AI 분석 결과</div>
           <div class="ai-fields">
             <div><label class="ai-lbl">구역</label><input type="text"   id="zoneInputM"   class="ai-inp" readonly placeholder="-"></div>
-            <div><label class="ai-lbl">포인트</label><input type="number" id="pointsInputM" class="ai-inp" placeholder="0" required></div>
+            <div><label class="ai-lbl">시간(분)</label><input type="number" id="pointsInputM" class="ai-inp" placeholder="0" required></div>
           </div>
         </div>
         <button type="submit" class="sub-btn">등록하기 🧹</button>
@@ -429,7 +431,7 @@ html,body{height:100%;font-family:'Pretendard Variable','Pretendard',-apple-syst
           <div class="ai-hdr"><span class="ai-dot"></span>Analysis Result</div>
           <div class="ai-fields">
             <div><label class="ai-lbl">Zone</label><input type="text"   id="zoneInput"   class="ai-inp" readonly placeholder="-"></div>
-            <div><label class="ai-lbl">Points</label><input type="number" id="pointsInput" class="ai-inp" placeholder="0" required></div>
+            <div><label class="ai-lbl">Mins</label><input type="number" id="pointsInput" class="ai-inp" placeholder="0" required></div>
           </div>
         </div>
         <button type="submit" id="submitBtn" class="d-sub">등록하기</button>
@@ -465,7 +467,7 @@ html,body{height:100%;font-family:'Pretendard Variable','Pretendard',-apple-syst
           <thead>
             <tr>
               <th>Date</th><th>Fairy</th><th>Activity</th>
-              <th class="r">Pts</th><th class="c">Action</th>
+              <th class="r">Mins</th><th class="c">Action</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
