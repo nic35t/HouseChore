@@ -860,80 +860,18 @@ function showToast(msg, icon = '✅') {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ── Mobile activity card renderer ──
-const ZONE_EMOJI = {
-  '주방': '🍳', '거실': '🛋️', '욕실': '🚿', '침실': '🛏️', '현관': '🚪',
-  '베란다': '🌿', '전체': '🏠', '기타': '✨'
-};
-function getZoneEmoji(zone) {
-  for (const [k, v] of Object.entries(ZONE_EMOJI)) if (zone?.includes(k)) return v;
-  return '🧹';
-}
-function formatDate(d) {
-  if (!d) return '';
-  const date = new Date(d);
-  return `${date.getMonth()+1}/${date.getDate()}`;
-}
-
-function renderActivityCard(log, isMe) {
-  const emoji = getZoneEmoji(log.zone);
-  const card = document.createElement('div');
-  card.className = 'activity-card';
-  card.innerHTML = `
-    <div class="activity-icon-wrap">${emoji}</div>
-    <div class="activity-info">
-      <div class="activity-title">${log.detail || ''}</div>
-      <div class="activity-meta">${log.name || ''} · ${formatDate(log.date)} ${log.zone ? '· ' + log.zone : ''}</div>
-    </div>
-    <div>
-      <div class="activity-pts">+${log.points || 0}</div>
-      <div class="activity-pts-label">pts</div>
-    </div>
-  `;
-  return card;
-}
-
-function renderMobileLists(logs) {
-  const recent = document.getElementById('recentListM');
-  const histAll = document.getElementById('historyListM');
-  if (!recent || !histAll) return;
-
-  // Recent (latest 5)
-  recent.innerHTML = '';
-  const latest = [...logs].slice(0, 5);
-  if (latest.length === 0) {
-    recent.innerHTML = `<div class="empty-state"><div class="empty-emoji">🌱</div><div class="empty-title">아직 기록이 없어요</div><div class="empty-desc">+ 버튼으로 첫 활동을 기록해보세요!</div></div>`;
-  } else {
-    latest.forEach(l => recent.appendChild(renderActivityCard(l)));
-  }
-
-  // History all
-  histAll.innerHTML = '';
-  if (logs.length === 0) {
-    histAll.innerHTML = `<div class="empty-state"><div class="empty-emoji">📋</div><div class="empty-title">기록이 없어요</div><div class="empty-desc">집안일을 기록하면 여기에 표시돼요.</div></div>`;
-  } else {
-    logs.forEach(l => histAll.appendChild(renderActivityCard(l)));
-  }
-}
-
-// Filter tabs
+// Filter tabs — delegates to app.js renderActivityList
 document.getElementById('filterTabsM')?.querySelectorAll('.filter-tab').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    // actual filter logic wired in app.js via window._allLogs
     const filter = btn.dataset.filter;
-    const logs = window._allLogs || [];
-    const currentUser = window._currentUserName || '';
-    const filtered = filter === 'me' ? logs.filter(l => l.name === currentUser) : logs;
-    const histAll = document.getElementById('historyListM');
-    histAll.innerHTML = '';
-    filtered.forEach(l => histAll.appendChild(renderActivityCard(l)));
+    window.app?._applyFilter(filter);
   });
 });
 </script>
 
-<!-- Firebase Logic (기존 app.js 그대로 연결) -->
+<!-- App Logic -->
 <script type="module" src="app.js"></script>
 </body>
 </html>
