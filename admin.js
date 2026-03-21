@@ -24,7 +24,8 @@ class AdminApp {
         document.getElementById('btnSaveRules').onclick = () => this.save();
     }
     async load() {
-        const snap = await getDoc(doc(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'settings'));
+        // [수정됨] 짝수 경로(6단계) 구성을 위해 settings 컬렉션 하위의 'global' 문서로 변경
+        const snap = await getDoc(doc(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'settings', 'global'));
         if(snap.exists()) { this.localRules = snap.data().rules || []; this.render(); }
     }
     render() {
@@ -39,7 +40,8 @@ class AdminApp {
     updRule(i, k, v) { this.localRules[i][k] = k==='pts'?parseInt(v)||0:v; }
     delRule(i) { this.localRules.splice(i, 1); this.render(); }
     async save() {
-        await setDoc(doc(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'settings'), {rules:this.localRules}, {merge:true});
+        // [수정됨] 짝수 경로(6단계) 구성을 위해 settings 컬렉션 하위의 'global' 문서로 변경
+        await setDoc(doc(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'settings', 'global'), {rules:this.localRules}, {merge:true});
         this.toast("규칙이 성공적으로 저장되었습니다.");
     }
     async export() {

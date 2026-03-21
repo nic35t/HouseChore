@@ -56,7 +56,14 @@ class ChoreApp {
             this.unsubscribers = [];
             this.user = user;
             this._toggleUI();
-            if (user) { this._loadRules(); this._loadData(); }
+            if (user) { 
+                // 모바일 브릿지 트리거: 유저 정보 세팅
+                if (window.setMobileUser) {
+                    window.setMobileUser(user.displayName, user.photoURL, user.email);
+                }
+                this._loadRules(); 
+                this._loadData(); 
+            }
         });
 
         this._bindEvents();
@@ -139,7 +146,8 @@ class ChoreApp {
 
     // ──────────────────────────────────────
     _loadRules() {
-        const ref = doc(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'settings');
+        // [수정됨] 짝수 경로(6단계) 구성을 위해 settings 컬렉션 하위의 'global' 문서로 명확히 지정
+        const ref = doc(this.db, 'artifacts', CONFIG.appId, 'public', 'data', 'settings', 'global');
         const u = onSnapshot(ref, s => {
             this.rules = s.exists() ? s.data().rules : CONFIG.defaultRules;
         }, err => console.error('Rules error:', err));
@@ -194,6 +202,10 @@ class ChoreApp {
                 document.getElementById('pointsInput').value = '';
             }
             this._toast('포인트 적립 완료! ✨');
+
+            // [추가됨] 모바일 브릿지 트리거 (mobile-bridge.js 연동)
+            if (window.onChoreAdded) window.onChoreAdded();
+
         } catch (err) {
             console.error('Save error:', err);
             this._toast('저장 오류 발생', 'err');
@@ -221,6 +233,11 @@ class ChoreApp {
             this._renderTable(data);
             this._renderDesktopCharts(data);
             this._renderMobile(data);
+
+            // [추가됨] 모바일 브릿지 업데이트 트리거 (mobile-bridge.js 연동)
+            if (window.updateMobileLogs) {
+                window.updateMobileLogs(data, this.user.displayName);
+            }
         }, err => console.error('Data error:', err));
         this.unsubscribers.push(u);
     }
