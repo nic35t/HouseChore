@@ -8,17 +8,13 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChang
                                  from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc }
                                  from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getRuntimeConfig } from "./config.js";
+
+const RUNTIME_CONFIG = getRuntimeConfig();
 
 const CONFIG = {
-    firebaseConfig: {
-        apiKey:            "REMOVED_FIREBASE_WEB_API_KEY",
-        authDomain:        "housechod.firebaseapp.com",
-        projectId:         "housechod",
-        storageBucket:     "housechod.firebasestorage.app",
-        messagingSenderId: "818673632451",
-        appId:             "1:818673632451:web:dc4a1f33335fb98b59ce76"
-    },
-    appId: 'housechod-v1',
+    firebaseConfig: RUNTIME_CONFIG.firebaseConfig,
+    appId: RUNTIME_CONFIG.appId,
     defaultRules: [
         { match: "설거지|식세기",          zone: '주방',    pts: 10 },
         { match: "분리수거|음식물|쓰레기",  zone: '외부',    pts: 15 },
